@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    overflow-x: hidden;
+}
+.searchinfo div{
+    height:80%;
+    display: grid;
+    place-content: center;
+    color: gray;
+    font-size: 1.2vw;
+}
+.place{
+    border-radius: 50vw 10vw 10vw 50vw;
+}
+.people{
+    border-radius:10vw 50vw 50vw 10vw ;
+}
+
+.homecard{
+    aspect-ratio: 2/2.2;
+}
