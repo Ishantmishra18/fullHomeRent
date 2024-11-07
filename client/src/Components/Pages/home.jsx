@@ -1,7 +1,7 @@
 import React from 'react'
 
 const home = () => {
-    let items =[1, 2, 4, 5, 6, 7,8,4,6,7,8,8,8,8,8,8,8,8,8,8,8,8,8]
+    let items =[1, 2, 4, 5, 6, 7,8,4]
   return (
     <div className='h-auto w-screen flex flex-wrap justify-center gap-4 mt-10 pt-10 overflow-x-hidden'>
         {items.map((val, key)=>(
