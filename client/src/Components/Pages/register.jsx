@@ -9,6 +9,8 @@ const Register = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+   
+
     const handleUser = (e) => {
         setUsername(e.target.value);
     };
@@ -37,7 +39,8 @@ const Register = () => {
             // Make the POST request to the backend
             const response = await axios.post('http://localhost:3000/register', {
                 username,
-                password
+                password,
+               
             });
 
             // If registration is successful, display a success message

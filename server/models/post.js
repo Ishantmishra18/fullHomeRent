@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const postSchema = new mongoose.Schema({
     title:String,
     address:String,
+    cover:String,
     photos:[String], //arrays of string
     des:String,
     prize:Number,

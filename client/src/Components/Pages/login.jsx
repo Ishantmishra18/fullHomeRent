@@ -2,12 +2,15 @@ import React, { useState ,useContext} from 'react'
 import { Link, Navigate  } from 'react-router-dom'
 import axios from 'axios'
 import { UserContext} from '../../context/userContext'
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa";
 
 const login = () => {
     const [username, setUsername]=useState('')
     const [password, setPassword]=useState('')
     const [redirect , setRedirect]=useState(false)
     const [error , setError]=useState('')
+    const [eye , setEye]=useState(false)
 
     const {setUser}=useContext(UserContext)
 
@@ -53,7 +56,15 @@ const login = () => {
             <form action="" onSubmit={loginSub} className='flex flex-col gap-4 items-center '>
                  <h1 className='text-3xl text-neutral-800'>Login User</h1>
                 <input type="text" placeholder='username' value={username} onChange={e=>setUsername(e.target.value)} className=' border-b-2 border-neutral-200 outline-none h-16 w-full' />
-                <input type="password" placeholder='password'  value={password} onChange={e=>setPassword(e.target.value)} className=' border-b-2 border-neutral-200  outline-none h-16 w-full'/>
+
+                <div className="border-b-2 border-neutral-200 h-16 w-full overflow-hidden relative">
+                     <input type={!eye?"password":'text'} placeholder='password'  value={password} onChange={e=>setPassword(e.target.value)} className='h-full w-full absolute top-0 outline-none'/>
+                     <div className='absolute cursor-pointer h-6 w-6  top-1/2 -translate-y-1/2 right-2' onClick={()=>setEye(!eye)}>
+                        {eye?<FaEye className='h-full w-full text-neutral-700'/>:<FaEyeSlash className='h-full w-full text-neutral-700'/>}
+
+                     </div>
+                     
+                </div>
                 {error && <p className="text-red-500">{error}</p>}
                 <input type="submit" className='h-16 w-full mt-24 bg-neutral-700 text-white rounded-md cursor-pointer'/>
                 <h4>Don't have an account? <Link to='/register' className='underline text-blue-600'>create account </Link></h4>

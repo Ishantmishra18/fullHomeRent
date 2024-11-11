@@ -7,8 +7,9 @@ import Register from './Components/Pages/register'
 import { UserContextProvider } from './context/userContext'
 import Account from './Components/Pages/account'
 import NewPlace from './Components/Pages/newPlace'
+import EditProfile from './Components/Pages/editprofile'
 
-const App = () => {
+const App = () => {  
 
   const router=createBrowserRouter([
     {
@@ -41,6 +42,10 @@ const App = () => {
     {
       path:'/account/accommodation/new',
       element:<NewPlace/>
+    },
+    {
+      path:'/editprofile',
+      element:<EditProfile/>
     }
   ])
   return (

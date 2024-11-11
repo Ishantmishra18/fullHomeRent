@@ -28,7 +28,6 @@ app.get("/",(req,res)=>{
 
 app.post('/register' , (req, res)=>{
     const {username , password}=req.body
-    console.log(`he ${username}`)
     bcrypt.genSalt(10, (err, salt)=>{
         bcrypt.hash(password , salt , async (err,hash)=>{
             let user= await User.create({
@@ -44,7 +43,7 @@ app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username }).populate('accommodation');
         
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -70,11 +69,7 @@ app.post('/login', async (req, res) => {
             // Send the response with user data (excluding password for security)
             return res.status(200).json({
                 message: 'Login successful',
-                user: {
-                    username: user.username,
-                    _id: user._id,
-                    name:'ishant'
-                }
+                user
             });
         } else {
             return res.status(401).json({ message: 'Incorrect password' });
@@ -85,20 +80,39 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/profile',(req , res)=>{
+app.get('/profile', async (req, res) => {
+    const { token } = req.cookies;
     
-    const {token} = req.cookies;
-    if(token){
-        jwt.verify(token , jwtsec , {} , async(err, user)=>{
-            const userData=await User.findById(user.id)
-            res.json({username:userData.username})
-            
-        })
+    if (token) {
+        jwt.verify(token, jwtsec, async (err, decodedToken) => {
+            if (err) {
+                console.error('JWT verification error:', err);
+                return res.status(403).json({ message: 'Invalid token' });
+            }
+
+            try {
+                // Ensure `decodedToken` has an `id`
+                if (!decodedToken || !decodedToken.id) {
+                    return res.status(400).json({ message: 'Invalid token payload' });
+                }
+
+                const userData = await User.findById(decodedToken.id).populate('accommodation');
+                
+                if (!userData) {
+                    return res.status(404).json({ message: 'User not found' });
+                }
+
+                res.json(userData);
+            } catch (error) {
+                console.error('Error retrieving user data:', error);
+                res.status(500).json({ message: 'Failed to retrieve user data' });
+            }
+        });
+    } else {
+        res.status(401).json({ message: 'Token not found' });
     }
-    else{
-        
-    }
-})
+});
+
 
 app.get('/logout', (req, res) => {
     console.log("Logging out user");
@@ -113,5 +127,47 @@ app.get('/logout', (req, res) => {
     res.status(200).json({ message: 'Logged out successfully' });
 });
 
+
+app.post("/addPlaces", async (req, res) => {
+    const { title, address, des, photo, perks } = req.body;
+    const {token} = req.cookies;
+
+    if (!token) {
+      return res.status(401).json({ error: "No authentication token found" });
+    }
+  
+    jwt.verify(token, jwtsec, {} , async(err, loggedUser) => {
+      if (err) {
+        return res.status(403).json({ error: "Invalid token" });
+      }
+  
+      try {
+        const post = await Post.create({
+          title,
+          address,
+          des,
+          cover:photo,
+          owner: loggedUser.id,
+        });
+
+        await User.findByIdAndUpdate(loggedUser.id, {
+            $push: { accommodation: post._id },
+          });
+        const user = await User.findById(loggedUser.id).populate('accommodation')
+        
+        res.status(201).json(user);
+      } catch (error) {
+        console.error("Error creating post:", error);
+        res.status(500).json({ error: "Failed to create post" });
+      }
+    });
+  });
+  app.post('/editprofile',async(req, res)=>{
+    const {cover , name , userId}=req.body
+    const user = await User.findByIdAndUpdate(userId,{cover,name})
+    res.status(200).json({mes:'all set'})
+
+
+  })
 
 app.listen(3000)

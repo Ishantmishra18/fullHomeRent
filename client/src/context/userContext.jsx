@@ -10,22 +10,19 @@ export function UserContextProvider({ children }) {
 
   // Maintain user on refresh
   useEffect(() => {
- 
-      
-        try {
-          if(!user){
-            axios.get('/profile').then(({data})=>{
-              setUser(data)
-            });
-          }
-          
-        } catch (error) {
-          console.error("Failed to fetch user:", error);
+    const fetchUser = async () => {
+      try {
+        if (!user) {
+          const { data } = await axios.get('/profile');
+          setUser(data);
         }
-        console.log('get user data')
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      }
+    };
 
-    
-  },[]);
+    fetchUser();
+  }, [user]);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
