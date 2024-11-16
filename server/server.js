@@ -7,6 +7,9 @@ const Post =require('./models/post')
 const bcrypt = require('bcrypt')
 const cookieParser=require('cookie-parser')
 const jwt = require("jsonwebtoken")
+const multer = require('multer');
+const path = require('path');
+const crypto = require('crypto'); // For generating random filenames
 
 
 
@@ -19,8 +22,23 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser())
 
-mongoose.connect('mongodb://localhost:27017/HomeRent')
+app.use(express.static(path.join(__dirname, 'public')));
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, './public/images');  // Use relative path starting from the project root
+    },
+    filename: (req, file, cb) => {
+      const randomString = crypto.randomBytes(16).toString('hex');
+      const uniqueName = `${Date.now()}-${randomString}${path.extname(file.originalname)}`;
+      cb(null, uniqueName);
+    },
+  });
+const upload = multer({ storage: storage });
+
+
+
+mongoose.connect('mongodb://localhost:27017/HomeRent')    //connection to database
 
 app.get("/",(req,res)=>{
     res.send('hello I am the server')
@@ -149,25 +167,43 @@ app.post("/addPlaces", async (req, res) => {
           cover:photo,
           owner: loggedUser.id,
         });
+        
+        const allPosts = await Post.find();
 
         await User.findByIdAndUpdate(loggedUser.id, {
             $push: { accommodation: post._id },
           });
         const user = await User.findById(loggedUser.id).populate('accommodation')
         
-        res.status(201).json(user);
+        res.status(201).json({user:user, post: allPosts});
+        
       } catch (error) {
         console.error("Error creating post:", error);
         res.status(500).json({ error: "Failed to create post" });
       }
     });
   });
-  app.post('/editprofile',async(req, res)=>{
-    const {cover , name , userId}=req.body
-    const user = await User.findByIdAndUpdate(userId,{cover,name})
-    res.status(200).json({mes:'all set'})
 
+  app.post('/editprofile', upload.single('cover'),async(req, res)=>{
+    const {name , userId}=req.body
+    console.log('hello')
+    const coverPath = req.file.filename;
+    const user = await User.findByIdAndUpdate(userId,{cover:coverPath,name})
+    res.status(200).json({mes:'all set' , cover:coverPath})
 
   })
+
+  app.get('/postdata', async (req, res) => {
+
+    try {
+        const posts = await Post.find().populate('owner'); 
+        res.json(posts);
+        console.log('data gay')
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: 'Failed to fetch posts' });
+    }
+});
+
 
 app.listen(3000)

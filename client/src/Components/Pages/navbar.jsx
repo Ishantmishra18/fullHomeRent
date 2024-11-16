@@ -22,8 +22,10 @@ const navbar = () => {
         <div className="people bg-white w-[12vw] rounded-r-full rounded-l-lg shadow-md shadow-sec">Who</div>
       </div>
       <div className="mainnavright pr-6"> 
-        <Link to={user?'/account':'/login'} className="login flex gap-3  items-center hover:bg-slate-200 px-6 py-2 rounded-lg cursor-pointer">
-        <BsPersonCircle className='h-[6vh] w-[6vh] aspect-auto text-black'/>
+        <Link to={user?'/account':'/login'} className="login flex gap-3  items-center hover:bg-slate-200 rounded-full px-6 py-2  cursor-pointer">
+        <div className={`imgcon aspect-square h-[8vh] rounded-full overflow-hidden ${user===null&&'hidden'}`}>
+          <img   src={user===null? 'http://localhost:3000/images/default.webp' : `http://localhost:3000/images/${user.cover}`}  alt="" className='h-full w-full object-cover' />
+        </div>
         <h2 className='text-black text-2xl'>{user!==null?user.username:'LogIn'}</h2>
         </Link>
         

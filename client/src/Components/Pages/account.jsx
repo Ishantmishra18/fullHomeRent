@@ -61,7 +61,7 @@ const account = () => {
         }
     ];
     
-    console.log(user.cover)
+   
 
     const logout=async ()=>{
         await axios.get("/logout")
@@ -77,7 +77,7 @@ const account = () => {
     <div className='w-screen h-auto flex'> 
     <div className="sidebar sticky top-0 w-[25vw] h-screen flex flex-col items-center p-10 gap-6 border-r-2">
         <div className="imgcont w-[60%] aspect-square rounded-full overflow-hidden hover:opacity-80">
-        <img src={user.cover} alt="" className='w-full h-full object-cover'/></div>
+        <img src={`http://localhost:3000/images/${user?.cover}`} alt="" className='w-full h-full object-cover'/></div>
         <Link to='/editprofile' className='text-white px-6 cursor-pointer py-2 rounded-full bg-neutral-600'>edit profile</Link>
         <h2 className='mt-4 text-3xl'><h2 className='text-lg text-neutral-600'>Welcome! </h2>{user?.username}</h2>
        
@@ -104,7 +104,7 @@ const account = () => {
     } else if (subdomain === '/account/booking') {
         return <Places places={arr2}/>;
     } else {
-        return <div className="">check your booking and accomodation </div>; // Replace with any default component if needed
+        return <div className="ml-8 text-xl">check your booking and accomodation </div>; // Replace with any default component if needed
     }
 })()}
     </div>
